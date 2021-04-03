@@ -1,31 +1,32 @@
 import { createFirstLevel } from "./units";
-import { cloneDeep, sortBy, filter, first, without, remove } from "lodash";
+import { cloneDeep, merge, remove } from "lodash";
 import { createField } from "./utils";
 import ACTION_TYPE from "./actionsTypes";
 import { uuidv4 } from "./utils";
+import { mergeDeepRight } from "ramda";
 
 export const initialGameState = {
   field: [],
   players: {
     human: {
       resources: 0,
-      buildings: []
+      buildings: [],
     },
     bot: {
       resources: 0,
-      buildings: []
-    }
+      buildings: [],
+    },
   },
   game: {
     turnNumber: 0,
     turns: [],
     currentTurn: [],
-    actionsToExecute: []
+    actionsToExecute: [],
   },
   allUnits: {
     byId: {},
-    list: []
-  }
+    list: [],
+  },
 };
 
 const reducer = (state = initialGameState, action) => {
@@ -33,7 +34,7 @@ const reducer = (state = initialGameState, action) => {
     case ACTION_TYPE.INIT_FIELD: {
       return {
         ...initialGameState,
-        field: createField(8, 8, 0, createFirstLevel())
+        field: createField(8, 8, 0, createFirstLevel()),
       };
     }
     case ACTION_TYPE.INIT_FIRST_LEVEL: {
@@ -105,17 +106,15 @@ const reducer = (state = initialGameState, action) => {
                 id: uuidv4(),
                 unitInstanceId: unit.id,
                 team: unit.team,
-                turn: state.game.turnNumber
-              }
+                turn: state.game.turnNumber,
+                delay: 500,
+              },
             };
 
             gameActions.push(actInstance);
           });
         }
       });
-
-      // BELOW WE ADD RESOURCES
-      // TODO MOVE TO ALL ACTIONS AND ADD PRIORITY
 
       gameActions.sort((action_1, action_2) =>
         action_1.priority > action_2.priority ? 1 : -1
@@ -124,53 +123,6 @@ const reducer = (state = initialGameState, action) => {
       newState.game.actionsToExecute = [...gameActions];
 
       newState.game.actionsToExecute.IS_EXECUTING = true;
-
-      // newState.players.human.buildings.forEach((building) => {
-      //   const isBuildingProducesResource =
-      //     building.type === UNIT_TYPE.MAIN_BASE;
-
-      //   if (isBuildingProducesResource) {
-      //     newState.players.human.resources += 1;
-      //   }
-
-      //   const isGatherer = building.type === UNIT_TYPE.GATHERER;
-
-      //   const { resources } = state;
-
-      //   // all this logic should be in 'Gather' ability of gatherer
-      //   if (isGatherer && resources.length) {
-      //     const distsToResources = resources.map((resource) => {
-      //       var vec1 = new Victor(building.posX, building.posY);
-      //       var vect2 = new Victor(resource.posX, resource.posY);
-
-      //       const distanceToBuilding = vect2.distance(vec1);
-      //       return { distanceToBuilding, resource };
-      //     });
-
-      //     const rem = filter(
-      //       sortBy(distsToResources, (obj) => obj.distance),
-      //       (obj) => obj.distanceToBuilding <= 1.9
-      //     );
-
-      //     const resToGather = first(rem);
-
-      //     if (resToGather) {
-      //       let resource = resToGather.resource;
-      //       if (resource.currentHitpoints > 0) {
-      //         resource.currentHitpoints -= 1;
-      //         newState.players.human.resources += 1;
-      //       } else {
-      //         // kil resource
-      //         const newResArray = without(
-      //           resources,
-      //           (res) => res.id === resource.id
-      //         );
-      //         newState.resources = newResArray;
-      //         newState.field[resource.posY][resource.posX] = 0;
-      //       }
-      //     }
-      //   }
-      // });
 
       newState.game.turnNumber += 1;
       newState.game.currentTurn = [];
@@ -208,7 +160,7 @@ const reducer = (state = initialGameState, action) => {
     case ACTION_TYPE.EXEC_ACTION: {
       const {
         execAction,
-        execAction: { instanceParams }
+        execAction: { instanceParams },
       } = action;
 
       const newState = cloneDeep(state);
@@ -221,7 +173,7 @@ const reducer = (state = initialGameState, action) => {
       );
       newState.game.actionsToExecute.IS_EXECUTING = false;
 
-      return { ...state, ...newState, ...nextState };
+      return mergeDeepRight(state, { ...newState, ...nextState });
     }
 
     default:

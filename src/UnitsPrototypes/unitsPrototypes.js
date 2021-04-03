@@ -1,10 +1,13 @@
-import { MainBaseGenerateResourcePrototype } from "../ActionsPrototypes/actionsPrototypes";
+import {
+  GathererGatherResource,
+  MainBaseGenerateResourcePrototype,
+} from "../ActionsPrototypes/actionsPrototypes";
 import {
   ExtenderInstance,
   GathererInstance,
   MainBaseInstance,
   MineralResourceInstance,
-  DiscThrowerInstance
+  DiscThrowerInstance,
 } from "../units";
 import { UNIT_TYPE } from "../UNIT_TYPE";
 import getAvailableCellsDefault from "./getAvailableCellsDefault";
@@ -17,7 +20,7 @@ const BuildingPrototype = ({
   gameConstructor = undefined,
   gameRender = undefined,
   getAvailableCells = undefined,
-  actions = []
+  actions = [],
 }) => {
   return {
     type,
@@ -27,7 +30,7 @@ const BuildingPrototype = ({
     gameConstructor,
     gameRender,
     getAvailableCells,
-    actions
+    actions,
   };
 };
 
@@ -40,7 +43,7 @@ export const MainBasePrototype = BuildingPrototype({
   gameConstructor: MainBaseInstance,
   gameRender: "main",
   getAvailableCells: getAvailableCellsDefault,
-  actions: [MainBaseGenerateResourcePrototype]
+  actions: [MainBaseGenerateResourcePrototype],
 });
 
 export const ExtenderPrototype = BuildingPrototype({
@@ -52,18 +55,18 @@ export const ExtenderPrototype = BuildingPrototype({
   gameConstructor: ExtenderInstance,
   gameRender: "extender",
   getAvailableCells: getAvailableCellsDefault,
-  actions: []
+  actions: [],
 });
 
 export const MineralResourcePrototype = BuildingPrototype({
   type: UNIT_TYPE.MINERAL_RESOURCE,
   cost: 0,
   cooldown: 0,
-  hitpoints: 20,
+  hitpoints: 1,
   buildingTime: 0,
   gameConstructor: MineralResourceInstance,
   gameRender: "resource",
-  actions: []
+  actions: [],
 });
 
 export const GathererPrototype = BuildingPrototype({
@@ -75,7 +78,7 @@ export const GathererPrototype = BuildingPrototype({
   gameConstructor: GathererInstance,
   gameRender: "gatherer",
   getAvailableCells: getAvailableCellsDefault,
-  actions: []
+  actions: [GathererGatherResource],
 });
 
 export const DiscThrowerPrototype = BuildingPrototype({
@@ -87,12 +90,12 @@ export const DiscThrowerPrototype = BuildingPrototype({
   gameConstructor: DiscThrowerInstance,
   gameRender: "thrower",
   getAvailableCells: getAvailableCellsDefault,
-  actions: []
+  actions: [],
 });
 
 export const BuildingPrototypes = {
   // [UNIT_TYPE.MAIN_BASE]: MainBasePrototype,
   [UNIT_TYPE.EXTENDER]: ExtenderPrototype,
   [UNIT_TYPE.GATHERER]: GathererPrototype,
-  [UNIT_TYPE.DISC_THROWER]: DiscThrowerPrototype
+  [UNIT_TYPE.DISC_THROWER]: DiscThrowerPrototype,
 };

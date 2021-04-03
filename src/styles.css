@@ -1,3 +1,7 @@
+:root {
+  --cell-size: 96px;
+}
+
 .App {
   font-family: sans-serif;
   text-align: center;
@@ -15,10 +19,6 @@
   width: 1920px;
   height: 1080px;
   flex-wrap: wrap;
-}
-
-:root {
-  --cell-size: 96px;
 }
 
 .fieldCellFixed {
@@ -142,20 +142,6 @@
   align-items: center;
 }
 
-.buildextenderButton {
-  /* border-radius: -10px;
-  border: 2px solid black;
-  height: 99%;
-  width: 99%; */
-}
-
-.buildgathererButton {
-  /* border-radius: 0px;
-  border: 2px solid black;
-  height: 99%;
-  width: 99%; */
-}
-
 .hpBarContainer {
   display: block;
   position: absolute;
@@ -170,4 +156,12 @@
   position: relative;
   background-color: green;
   height: 100%;
+}
+
+.mainBaseGenerateAnimation::after {
+  content: "";
+  border-radius: 16px;
+  width: 4px;
+  height: 4px;
+  z-index: 99999;
 }

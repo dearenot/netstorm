@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useMemo, useReducer } from "react";
 import "./styles.css";
 import Cell from "./Cell";
 import reducer, { initialGameState } from "./reducer";
@@ -9,8 +9,34 @@ import GameActionsUI from "./GameActionsUI";
 
 export const SKIP_TURN = "SKIP_TURN";
 
+const newDispatch = (dispatch) => {
+  return (action) => {
+    if (action.type === ACTION_TYPE.EXEC_ACTION) {
+      return new Promise((resolve) => {
+        console.log(action);
+
+        const { delay } = action.execAction.instanceParams;
+
+        // start anim
+        dispatch(action);
+
+        // after act delay
+        setTimeout(() => {
+          console.log("resolve");
+
+          resolve();
+        }, delay);
+      });
+    } else {
+      dispatch(action);
+    }
+  };
+};
+
 const App = () => {
   const [state, dispatch] = useReducer(reducer, initialGameState);
+
+  const patchedDispatch = useMemo(() => newDispatch(dispatch), [dispatch]);
 
   window.state = state;
 
@@ -19,7 +45,7 @@ const App = () => {
     players: { human, bot },
     game: { currentTurn, turnNumber, actionsToExecute },
     allUnits: { byId: unitsById },
-    resources
+    resources,
   } = state;
 
   const { currentBuilding, buildings, buildingPrototype } = human;
@@ -28,7 +54,7 @@ const App = () => {
     buildingPrototype?.getAvailableCells(state, "human", currentBuilding) || [];
 
   useEffect(() => {
-    dispatch({ type: ACTION_TYPE.INIT_FIRST_LEVEL });
+    patchedDispatch({ type: ACTION_TYPE.INIT_FIRST_LEVEL });
   }, []);
 
   const handleCellClick = useCallback(
@@ -43,10 +69,14 @@ const App = () => {
         buildingPrototype,
         posX: indexX,
         posY: indexY,
-        playerId: "human"
+        playerId: "human",
       };
 
-      dispatch({ type: ACTION_TYPE.ADD_PLAYER_TURN, playerId: "human", act });
+      patchedDispatch({
+        type: ACTION_TYPE.ADD_PLAYER_TURN,
+        playerId: "human",
+        act,
+      });
     },
     [currentBuilding]
   );
@@ -60,10 +90,14 @@ const App = () => {
       if (humanMadeTurn && !botMadeTurn) {
         let act = {
           type: ACTION_TYPE.SKIP_TURN,
-          playerId: "bot"
+          playerId: "bot",
         };
 
-        dispatch({ type: ACTION_TYPE.ADD_PLAYER_TURN, playerId: "bot", act });
+        patchedDispatch({
+          type: ACTION_TYPE.ADD_PLAYER_TURN,
+          playerId: "bot",
+          act,
+        });
       }
     }
   }, [currentTurn]);
@@ -75,20 +109,37 @@ const App = () => {
       const botMadeTurn = currentTurn.some((act) => act.playerId === "bot");
 
       if (humanMadeTurn && botMadeTurn) {
-        dispatch({ type: ACTION_TYPE.RESOLVE_TURN });
+        patchedDispatch({ type: ACTION_TYPE.RESOLVE_TURN });
       }
     }
   }, [currentTurn]);
 
+  async function processArray(array) {
+    for (const item of array) {
+      await patchedDispatch(item);
+    }
+    console.log("Done!");
+  }
+
   //exec acts
-  useEffect(() => {
+  useEffect(async () => {
     if (actionsToExecute.length && actionsToExecute.IS_EXECUTING) {
       actionsToExecute.IS_EXECUTING = false;
 
       console.log("act to exec ", actionsToExecute);
-      actionsToExecute.forEach((action) => {
-        dispatch({ type: ACTION_TYPE.EXEC_ACTION, execAction: action });
+
+      const acts = [];
+
+      actionsToExecute.forEach((element) => {
+        acts.push(element);
       });
+
+      for (const act of acts) {
+        await patchedDispatch({
+          type: ACTION_TYPE.EXEC_ACTION,
+          execAction: act,
+        });
+      }
     }
   }, [actionsToExecute]);
 
@@ -96,14 +147,14 @@ const App = () => {
     (event) => {
       const { type, buildingPrototype } = event;
 
-      dispatch({
+      patchedDispatch({
         type: ACTION_TYPE.SET_CURRENT_BUILDING,
         playerId: "human",
         building: type,
-        buildingPrototype
+        buildingPrototype,
       });
     },
-    [dispatch]
+    [patchedDispatch]
   );
 
   const handleUIActionClick = useCallback(
@@ -112,26 +163,29 @@ const App = () => {
         case ACTION_TYPE.SKIP_TURN: {
           const playerAction = {
             type: ACTION_TYPE.SKIP_TURN,
-            playerId: "human"
+            playerId: "human",
           };
 
-          dispatch({
+          patchedDispatch({
             type: ACTION_TYPE.ADD_PLAYER_TURN,
             playerId: "human",
-            act: playerAction
+            act: playerAction,
           });
 
           break;
         }
         case ACTION_TYPE.CANCEL_BUILDING: {
-          dispatch({ type: ACTION_TYPE.CANCEL_BUILDING, playerId: "human" });
+          patchedDispatch({
+            type: ACTION_TYPE.CANCEL_BUILDING,
+            playerId: "human",
+          });
           break;
         }
         default:
           return null;
       }
     },
-    [dispatch]
+    [patchedDispatch]
   );
 
   //TODO move ui buttons from building buttons
