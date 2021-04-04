@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import ACTION_TYPE from "./actionsTypes";
 import { SKIP_TURN } from "./App";
 
-function GameActionsUI({ onButtonClick }) {
+function GameActionsUI({ onButtonClick, turnIsResolving = false }) {
   const items = [ACTION_TYPE.CANCEL_BUILDING, SKIP_TURN];
 
   const handleClick = useCallback(
@@ -15,7 +15,12 @@ function GameActionsUI({ onButtonClick }) {
   );
 
   return items.map((item) => (
-    <button key={item} data-value={item} onClick={handleClick}>
+    <button
+      key={item}
+      data-value={item}
+      onClick={handleClick}
+      disabled={turnIsResolving}
+    >
       {item}
     </button>
   ));

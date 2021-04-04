@@ -45,7 +45,7 @@ const App = () => {
   const {
     field,
     players: { human, bot },
-    game: { currentTurn, turnNumber, actionsToExecute },
+    game: { currentTurn, turnNumber, actionsToExecute, turnIsResolving },
     allUnits: unitsById,
   } = state;
 
@@ -128,6 +128,7 @@ const App = () => {
     async function asyncActs() {
       if (actionsToExecute.length && actionsToExecute.IS_EXECUTING) {
         actionsToExecute.IS_EXECUTING = false;
+        patchedDispatch({ type: ACTION_TYPE.START_TURN_RESOLVE });
 
         const acts = [];
 
@@ -141,8 +142,11 @@ const App = () => {
             execAction: act,
           });
         }
+
+        patchedDispatch({ type: ACTION_TYPE.END_TURN_RESOLVE });
       }
     }
+
     asyncActs();
   }, [actionsToExecute, patchedDispatch]);
 
@@ -235,8 +239,15 @@ const App = () => {
         </div>
 
         <div>turn number {turnNumber}</div>
-        <BuildingUI human={human} onBuildButtonClick={handleBuildButtonClick} />
-        <GameActionsUI onButtonClick={handleUIActionClick} />
+        <BuildingUI
+          human={human}
+          onBuildButtonClick={handleBuildButtonClick}
+          turnIsResolving={turnIsResolving}
+        />
+        <GameActionsUI
+          onButtonClick={handleUIActionClick}
+          turnIsResolving={turnIsResolving}
+        />
       </div>
     </div>
   );

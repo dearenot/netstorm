@@ -1,7 +1,7 @@
 import BuildButton from "./BuildButton";
 import { BuildingPrototypes } from "./UnitsPrototypes/unitsPrototypes";
 
-const BuildingUI = ({ human, onBuildButtonClick }) => {
+const BuildingUI = ({ human, onBuildButtonClick, turnIsResolving = false }) => {
   const items = Object.keys(BuildingPrototypes);
 
   return (
@@ -14,6 +14,7 @@ const BuildingUI = ({ human, onBuildButtonClick }) => {
             key={building}
             type={building}
             onClick={onBuildButtonClick}
+            turnIsResolving={turnIsResolving}
           />
         );
       })}

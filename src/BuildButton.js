@@ -7,23 +7,24 @@ const BuildButton = ({
   cooldown,
   onClick,
   buildingPrototype,
-  player
+  player,
+  turnIsResolving,
 }) => {
   let innerClassName = `build${type.toLowerCase()}Button`;
 
   const isDisabled = useMemo(() => {
     if (buildingPrototype) {
-      return player.resources <= buildingPrototype.cost;
+      return player.resources <= buildingPrototype.cost || turnIsResolving;
     }
 
     if (type === "CANCEL_BUILDING") {
       if (!player.currentBuilding) {
-        return true;
+        return turnIsResolving;
       }
     }
 
     return false;
-  }, [player, buildingPrototype, type]);
+  }, [player, buildingPrototype, type, turnIsResolving]);
 
   const handleClick = useCallback(() => {
     onClick({ type, buildingPrototype });

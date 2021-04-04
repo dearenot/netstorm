@@ -173,6 +173,14 @@ const reducer = (state = initialGameState, action) => {
       return mergeDeepRight(state, { ...newState, ...nextState });
     }
 
+    case ACTION_TYPE.START_TURN_RESOLVE: {
+      return { ...state, game: { ...state.game, turnIsResolving: true } };
+    }
+
+    case ACTION_TYPE.END_TURN_RESOLVE: {
+      return { ...state, game: { ...state.game, turnIsResolving: false } };
+    }
+
     default:
       return state;
   }
