@@ -150,6 +150,10 @@ const discThrowerThrow = (state, options) => {
   return newState;
 };
 
+export const sunCannonShoot = () => {
+  return {};
+};
+
 export const MainBaseGenerateResourcePrototype = ActionPrototype({
   type: "MAIN_BASE_GENERATE_RESOURCE",
   priority: 10000,
@@ -168,4 +172,10 @@ export const DiscThrowerThrow = ActionPrototype({
   type: "DISC_THROWER_THROW",
   priority: 100,
   execute: discThrowerThrow,
+});
+
+export const SunCannonShoot = ActionPrototype({
+  type: "SUN_CANNON_SHOOT",
+  priority: 200,
+  execute: sunCannonShoot,
 });

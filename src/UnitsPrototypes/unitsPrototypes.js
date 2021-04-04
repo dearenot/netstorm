@@ -9,6 +9,7 @@ import {
   MainBaseInstance,
   MineralResourceInstance,
   DiscThrowerInstance,
+  SunCannonInstance,
 } from "../units";
 import { UNIT_TYPE } from "../UNIT_TYPE";
 import getAvailableCellsDefault from "./getAvailableCellsDefault";
@@ -94,9 +95,22 @@ export const DiscThrowerPrototype = BuildingPrototype({
   actions: [DiscThrowerThrow],
 });
 
+export const SunCannonPrototype = BuildingPrototype({
+  type: UNIT_TYPE.SUN_CANNON,
+  cost: 1,
+  cooldown: 2,
+  hitpoints: 6,
+  buildingTime: 0,
+  gameConstructor: SunCannonInstance,
+  gameRender: "sun_cannon",
+  getAvailableCells: getAvailableCellsDefault,
+  actions: [],
+});
+
 export const BuildingPrototypes = {
   // [UNIT_TYPE.MAIN_BASE]: MainBasePrototype,
   [UNIT_TYPE.EXTENDER]: ExtenderPrototype,
   [UNIT_TYPE.GATHERER]: GathererPrototype,
   [UNIT_TYPE.DISC_THROWER]: DiscThrowerPrototype,
+  [UNIT_TYPE.SUN_CANNON]: SunCannonPrototype,
 };

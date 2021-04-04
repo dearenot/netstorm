@@ -97,6 +97,7 @@ const App = () => {
       const botMadeTurn = currentTurn.some((act) => act.playerId === "bot");
 
       if (humanMadeTurn && !botMadeTurn) {
+        // make ai turn
         let act = {
           type: ACTION_TYPE.SKIP_TURN,
           playerId: "bot",

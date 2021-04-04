@@ -4,6 +4,7 @@ import {
   GathererPrototype,
   MainBasePrototype,
   MineralResourcePrototype,
+  SunCannonPrototype,
 } from "./UnitsPrototypes/unitsPrototypes";
 import { UNIT_TYPE } from "./UNIT_TYPE";
 import { uuidv4 } from "./utils";
@@ -89,6 +90,23 @@ export function GathererInstance({
   };
 }
 
+export function SunCannonInstance({
+  team,
+  id = `${team}_sun_cannon_${uuidv4()}`,
+  posX,
+  posY,
+}) {
+  return {
+    type: UNIT_TYPE.SUN_CANNON,
+    id,
+    posX,
+    posY,
+    team,
+    currentHitpoints: SunCannonPrototype.hitpoints,
+    gamePrototype: SunCannonPrototype,
+  };
+}
+
 //
 
 export const Player = ({ id, team, resources = 0, buildings = [] }) => {
@@ -167,7 +185,12 @@ export const createFirstLevel = () => {
     team: "neutral",
   });
 
-  // TODO move resources to global units
+  const BotDisc1 = DiscThrowerInstance({
+    team: "bot",
+    id: "bot_main_disc_1",
+    posX: 6,
+    posY: 6,
+  });
 
   const field30 = createField(8, 8);
   addToField(field30, HumanMain);
@@ -175,6 +198,7 @@ export const createFirstLevel = () => {
   addToField(field30, resBot);
   addToField(field30, resCentral);
   addToField(field30, resHuman);
+  addToField(field30, BotDisc1);
 
   return {
     field: field30,
@@ -195,6 +219,7 @@ export const createFirstLevel = () => {
       [resHuman.id]: resHuman,
       [resBot.id]: resBot,
       [resCentral.id]: resCentral,
+      [BotDisc1.id]: BotDisc1,
     },
   };
 };
