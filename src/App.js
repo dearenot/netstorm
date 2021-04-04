@@ -45,17 +45,15 @@ const App = () => {
     field,
     players: { human, bot },
     game: { currentTurn, turnNumber, actionsToExecute },
-    allUnits: { byId: unitsById },
-    resources,
+    allUnits: { byId: unitsById, list: unitsList },
   } = state;
 
   const { currentBuilding, buildings, buildingPrototype } = human;
 
-  // const resFromUnits = useMemo(() =>
-  //   allUnits.filter((unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE, [
-  //     allUnits,
-  //   ])
-  // );
+  const resFromUnits = useMemo(
+    () => unitsList.filter((unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE),
+    [unitsList]
+  );
 
   const availableCells =
     buildingPrototype?.getAvailableCells(state, "human", currentBuilding) || [];
@@ -85,7 +83,7 @@ const App = () => {
         act,
       });
     },
-    [currentBuilding]
+    [currentBuilding, patchedDispatch]
   );
 
   // make bot turn
@@ -215,7 +213,7 @@ const App = () => {
                   indexY={indexY}
                   onClick={handleCellClick}
                   humanBuildings={buildings}
-                  resources={resources}
+                  resources={resFromUnits}
                   unitsById={unitsById}
                   id={`${indexY}_${indexX}`}
                   availableCells={availableCells}

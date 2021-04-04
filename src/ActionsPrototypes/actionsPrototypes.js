@@ -1,5 +1,16 @@
-import { get, noop, filter, without, sortBy, first, set, omit } from "lodash";
+import {
+  get,
+  noop,
+  filter,
+  without,
+  sortBy,
+  first,
+  set,
+  omit,
+  pickBy,
+} from "lodash";
 import Victor from "victor";
+import { UNIT_TYPE } from "../UNIT_TYPE";
 
 const ActionPrototype = ({
   type = "DEFAULT_ACTION_PROTOTYPE",
@@ -31,12 +42,15 @@ const MainBaseGenerateResourceExecute = (state, options) => {
 
 const gathererGatherResource = (state, options) => {
   const {
-    resources,
-    allUnits: { byId: allUnitsIds },
+    allUnits: { byId: allUnitsIds, list: allUnitsList },
   } = state;
   const { unitInstanceId } = options;
 
   const building = allUnitsIds[unitInstanceId];
+
+  const resources = allUnitsList.filter(
+    (unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE
+  );
 
   const newState = {};
 
@@ -58,6 +72,7 @@ const gathererGatherResource = (state, options) => {
 
     if (resourceToGather) {
       let resource = resourceToGather.resource;
+
       if (resource.currentHitpoints > 0) {
         const pathHps = `allUnits.byId[${resource.id}].currentHitpoints`;
         const curHp = get(state, pathHps, 0);
@@ -68,17 +83,13 @@ const gathererGatherResource = (state, options) => {
         const cur = get(state, path, 0);
 
         set(newState, path, cur + 1);
-        console.log(cur);
+
         if (curHp - 1 <= 0) {
-          // kil resource
-
-          console.log("kil res");
-
-          const newResArray = without(
-            resources,
-            (res) => res.id === resource.id
+          newState.allUnits.byId = pickBy(
+            state.allUnits.byId,
+            (unit) => unit.id !== resource.id
           );
-          newState.resources = newResArray;
+
           newState.field = [...state.field];
           newState.field[resource.posY][resource.posX] = 0;
         }

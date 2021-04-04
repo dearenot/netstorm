@@ -178,7 +178,6 @@ export const createFirstLevel = () => {
 
   return {
     field: field30,
-    resources: [resBot, resHuman, resCentral],
     players: {
       [HumanPlayer.id]: HumanPlayer,
       [BotPlayer.id]: BotPlayer,
