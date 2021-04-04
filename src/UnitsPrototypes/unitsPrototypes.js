@@ -1,4 +1,5 @@
 import {
+  DiscThrowerThrow,
   GathererGatherResource,
   MainBaseGenerateResourcePrototype,
 } from "../ActionsPrototypes/actionsPrototypes";
@@ -62,7 +63,7 @@ export const MineralResourcePrototype = BuildingPrototype({
   type: UNIT_TYPE.MINERAL_RESOURCE,
   cost: 0,
   cooldown: 0,
-  hitpoints: 1,
+  hitpoints: 2,
   buildingTime: 0,
   gameConstructor: MineralResourceInstance,
   gameRender: "resource",
@@ -90,7 +91,7 @@ export const DiscThrowerPrototype = BuildingPrototype({
   gameConstructor: DiscThrowerInstance,
   gameRender: "thrower",
   getAvailableCells: getAvailableCellsDefault,
-  actions: [],
+  actions: [DiscThrowerThrow],
 });
 
 export const BuildingPrototypes = {

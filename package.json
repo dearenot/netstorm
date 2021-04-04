@@ -4,6 +4,9 @@
   "description": "",
   "keywords": [],
   "main": "src/index.js",
+  "eslintConfig": {
+    "extends": "react-app"
+  },
   "dependencies": {
     "@babel/runtime": "7.13.8",
     "lodash": "4.17.21",

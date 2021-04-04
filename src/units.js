@@ -3,7 +3,7 @@ import {
   ExtenderPrototype,
   GathererPrototype,
   MainBasePrototype,
-  MineralResourcePrototype
+  MineralResourcePrototype,
 } from "./UnitsPrototypes/unitsPrototypes";
 import { UNIT_TYPE } from "./UNIT_TYPE";
 import { uuidv4 } from "./utils";
@@ -12,7 +12,7 @@ export function DiscThrowerInstance({
   team,
   id = `${team}_thrower_${uuidv4()}`,
   posX,
-  posY
+  posY,
 }) {
   return {
     type: UNIT_TYPE.DISC_THROWER,
@@ -21,7 +21,7 @@ export function DiscThrowerInstance({
     posX,
     posY,
     currentHitpoints: DiscThrowerPrototype.hitpoints,
-    gamePrototype: DiscThrowerPrototype
+    gamePrototype: DiscThrowerPrototype,
   };
 }
 
@@ -29,7 +29,7 @@ export function MainBaseInstance({
   team,
   id = `${team}_main_${uuidv4()}`,
   posX,
-  posY
+  posY,
 }) {
   return {
     type: UNIT_TYPE.MAIN_BASE,
@@ -39,7 +39,7 @@ export function MainBaseInstance({
     posY,
     currentHitpoints: MainBasePrototype.hitpoints,
     gamePrototype: MainBasePrototype,
-    actions: MainBasePrototype.actions
+    actions: MainBasePrototype.actions,
   };
 }
 
@@ -47,7 +47,7 @@ export function ExtenderInstance({
   team,
   id = `${team}_extender_${uuidv4()}`,
   posX,
-  posY
+  posY,
 }) {
   return {
     type: UNIT_TYPE.EXTENDER,
@@ -56,7 +56,7 @@ export function ExtenderInstance({
     posX,
     posY,
     currentHitpoints: ExtenderPrototype.hitpoints,
-    gamePrototype: ExtenderPrototype
+    gamePrototype: ExtenderPrototype,
   };
 }
 
@@ -68,7 +68,7 @@ export function MineralResourceInstance({ id = uuidv4(), posX, posY, team }) {
     posY,
     team,
     currentHitpoints: MineralResourcePrototype.hitpoints,
-    gamePrototype: MineralResourcePrototype
+    gamePrototype: MineralResourcePrototype,
   };
 }
 
@@ -76,7 +76,7 @@ export function GathererInstance({
   team,
   id = `${team}_gatherer_${uuidv4()}`,
   posX,
-  posY
+  posY,
 }) {
   return {
     type: UNIT_TYPE.GATHERER,
@@ -85,7 +85,7 @@ export function GathererInstance({
     posY,
     team,
     currentHitpoints: GathererPrototype.hitpoints,
-    gamePrototype: GathererPrototype
+    gamePrototype: GathererPrototype,
   };
 }
 
@@ -96,7 +96,7 @@ export const Player = ({ id, team, resources = 0, buildings = [] }) => {
     id,
     team,
     resources,
-    buildings
+    buildings,
   };
 };
 
@@ -124,26 +124,26 @@ export const createFirstLevel = () => {
     team: "human",
     id: "human_main_1",
     posX: 0,
-    posY: 0
+    posY: 0,
   });
   const BotMain = MainBaseInstance({
     team: "bot",
     id: "bot_main_1",
     posX: 7,
-    posY: 7
+    posY: 7,
   });
 
   const HumanPlayer = Player({
     id: "human",
     team: 0,
     resources: 1,
-    buildings: [HumanMain]
+    buildings: [HumanMain],
   });
   const BotPlayer = Player({
     id: "bot",
     team: 1,
     resources: 1,
-    buildings: [BotMain]
+    buildings: [BotMain],
   });
 
   // console.log(HumanMain, BotMain);
@@ -151,17 +151,20 @@ export const createFirstLevel = () => {
   const resHuman = MineralResourceInstance({
     id: "mineral_resource_hum",
     posX: 2,
-    posY: 1
+    posY: 1,
+    team: "neutral",
   });
   const resBot = MineralResourceInstance({
     id: "mineral_resource_bot",
     posX: 5,
-    posY: 6
+    posY: 6,
+    team: "neutral",
   });
   const resCentral = MineralResourceInstance({
     id: "mineral_resource_central",
     posX: 3,
-    posY: 4
+    posY: 4,
+    team: "neutral",
   });
 
   // TODO move resources to global units
@@ -178,13 +181,13 @@ export const createFirstLevel = () => {
     resources: [resBot, resHuman, resCentral],
     players: {
       [HumanPlayer.id]: HumanPlayer,
-      [BotPlayer.id]: BotPlayer
+      [BotPlayer.id]: BotPlayer,
     },
     game: {
       turnNumber: 0,
       turns: [],
       currentTurn: [],
-      actionsToExecute: []
+      actionsToExecute: [],
     },
     allUnits: {
       byId: {
@@ -192,9 +195,9 @@ export const createFirstLevel = () => {
         [HumanMain.id]: HumanMain,
         [resHuman.id]: resHuman,
         [resBot.id]: resBot,
-        [resCentral.id]: resCentral
+        [resCentral.id]: resCentral,
       },
-      list: [BotMain, HumanMain, resHuman, resBot, resCentral]
-    }
+      list: [BotMain, HumanMain, resHuman, resBot, resCentral],
+    },
   };
 };

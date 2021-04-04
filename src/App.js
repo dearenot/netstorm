@@ -6,6 +6,7 @@ import ACTION_TYPE from "./actionsTypes";
 import { isNil } from "lodash";
 import BuildingUI from "./BuildingUI";
 import GameActionsUI from "./GameActionsUI";
+import { UNIT_TYPE } from "./UNIT_TYPE";
 
 export const SKIP_TURN = "SKIP_TURN";
 
@@ -13,9 +14,9 @@ const newDispatch = (dispatch) => {
   return (action) => {
     if (action.type === ACTION_TYPE.EXEC_ACTION) {
       return new Promise((resolve) => {
-        console.log(action);
-
         const { delay } = action.execAction.instanceParams;
+
+        // pass top level resolve and dispatch to exec action
 
         // start anim
         dispatch(action);
@@ -49,6 +50,12 @@ const App = () => {
   } = state;
 
   const { currentBuilding, buildings, buildingPrototype } = human;
+
+  // const resFromUnits = useMemo(() =>
+  //   allUnits.filter((unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE, [
+  //     allUnits,
+  //   ])
+  // );
 
   const availableCells =
     buildingPrototype?.getAvailableCells(state, "human", currentBuilding) || [];
@@ -118,30 +125,30 @@ const App = () => {
     for (const item of array) {
       await patchedDispatch(item);
     }
-    console.log("Done!");
   }
 
   //exec acts
-  useEffect(async () => {
-    if (actionsToExecute.length && actionsToExecute.IS_EXECUTING) {
-      actionsToExecute.IS_EXECUTING = false;
+  useEffect(() => {
+    async function asyncActs() {
+      if (actionsToExecute.length && actionsToExecute.IS_EXECUTING) {
+        actionsToExecute.IS_EXECUTING = false;
 
-      console.log("act to exec ", actionsToExecute);
+        const acts = [];
 
-      const acts = [];
-
-      actionsToExecute.forEach((element) => {
-        acts.push(element);
-      });
-
-      for (const act of acts) {
-        await patchedDispatch({
-          type: ACTION_TYPE.EXEC_ACTION,
-          execAction: act,
+        actionsToExecute.forEach((element) => {
+          acts.push(element);
         });
+
+        for (const act of acts) {
+          await patchedDispatch({
+            type: ACTION_TYPE.EXEC_ACTION,
+            execAction: act,
+          });
+        }
       }
     }
-  }, [actionsToExecute]);
+    asyncActs();
+  }, [actionsToExecute, patchedDispatch]);
 
   const handleBuildButtonClick = useCallback(
     (event) => {

@@ -1,4 +1,4 @@
-import { get, noop, filter, without, sortBy, first, set } from "lodash";
+import { get, noop, filter, without, sortBy, first, set, omit } from "lodash";
 import Victor from "victor";
 
 const ActionPrototype = ({
@@ -17,8 +17,6 @@ const ActionPrototype = ({
 const RANGE_1 = 1.9;
 
 const MainBaseGenerateResourceExecute = (state, options) => {
-  const playersState = get(state, "players", {});
-
   const { team } = options;
 
   const curValue = state.players[team].resources;
@@ -40,11 +38,8 @@ const gathererGatherResource = (state, options) => {
 
   const building = allUnitsIds[unitInstanceId];
 
-  console.log(building, options);
-
   const newState = {};
 
-  // all this logic should be in 'Gather' ability of gatherer
   if (resources.length) {
     const distsToResources = resources.map((resource) => {
       var vec1 = new Victor(building.posX, building.posY);
@@ -64,22 +59,101 @@ const gathererGatherResource = (state, options) => {
     if (resourceToGather) {
       let resource = resourceToGather.resource;
       if (resource.currentHitpoints > 0) {
-        resource.currentHitpoints -= 1;
-        // here
+        const pathHps = `allUnits.byId[${resource.id}].currentHitpoints`;
+        const curHp = get(state, pathHps, 0);
+
+        set(newState, pathHps, curHp - 1);
+
         const path = `players[${building.team}].resources`;
         const cur = get(state, path, 0);
-        console.log(cur);
+
         set(newState, path, cur + 1);
-      } else {
-        // kil resource
-        const newResArray = without(resources, (res) => res.id === resource.id);
-        newState.resources = newResArray;
-        newState.field = [...state.field];
-        newState.field[resource.posY][resource.posX] = 0;
+        console.log(cur);
+        if (curHp - 1 <= 0) {
+          // kil resource
+
+          console.log("kil res");
+
+          const newResArray = without(
+            resources,
+            (res) => res.id === resource.id
+          );
+          newState.resources = newResArray;
+          newState.field = [...state.field];
+          newState.field[resource.posY][resource.posX] = 0;
+        }
       }
     }
   }
-  console.log("gath state to return ", newState);
+
+  return newState;
+};
+
+const discThrowerThrow = (state, options) => {
+  const {
+    allUnits: { byId: allUnitsIds, list: allUnitsList },
+  } = state;
+  const { unitInstanceId } = options;
+
+  const newState = {};
+
+  const building = allUnitsIds[unitInstanceId];
+
+  const hasEnemies = allUnitsList
+    .filter((unit) => unit.team !== "neutral")
+    .some((unit) => unit.team !== building.team);
+
+  if (hasEnemies) {
+    console.log("has enemies");
+
+    const distsToEnemies = allUnitsList
+      .filter((unit) => unit.team !== building.team && unit.team !== "neutral")
+      .map((unit) => {
+        var vec1 = new Victor(building.posX, building.posY);
+        var vect2 = new Victor(unit.posX, unit.posY);
+
+        const distanceToBuilding = vect2.distance(vec1);
+        return { distanceToBuilding, enemy: unit };
+      });
+
+    const enemiesWithinRange = filter(
+      sortBy(distsToEnemies, (obj) => obj.distance),
+      (obj) => obj.distanceToBuilding <= RANGE_1
+    );
+
+    const enemyToAttack = first(enemiesWithinRange);
+
+    if (enemyToAttack) {
+      let enemy = enemyToAttack.enemy;
+      if (enemy.currentHitpoints > 0) {
+        const path = `allUnits.byId[${enemy.id}].currentHitpoints`;
+        const cur = get(state, path, 0);
+
+        set(newState, path, cur - 1);
+
+        console.log(cur);
+      } else {
+        // kil enemy
+        const newUnitsArr = without(
+          allUnitsList,
+          (unit) => unit.id === enemy.id
+        );
+        const newUnitsObj = omit(allUnitsIds, (unit) => unit.id === enemy.id);
+
+        newState.allUnits = {
+          byId: { ...allUnitsIds },
+          list: [...allUnitsList],
+        };
+
+        newState.allUnits.byId = newUnitsObj;
+        newState.allUnits.list = newUnitsArr;
+
+        newState.field = [...state.field];
+        newState.field[enemy.posY][enemy.posX] = 0;
+      }
+    }
+  }
+
   return newState;
 };
 
@@ -95,4 +169,10 @@ export const GathererGatherResource = ActionPrototype({
   priority: 999999,
   execute: gathererGatherResource,
   resourceAmountToGenerate: 1,
+});
+
+export const DiscThrowerThrow = ActionPrototype({
+  type: "DISC_THROWER_THROW",
+  priority: 100,
+  execute: discThrowerThrow,
 });
