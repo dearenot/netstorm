@@ -187,16 +187,14 @@ export const createFirstLevel = () => {
       turns: [],
       currentTurn: [],
       actionsToExecute: [],
+      turnIsResolving: false,
     },
     allUnits: {
-      byId: {
-        [BotMain.id]: BotMain,
-        [HumanMain.id]: HumanMain,
-        [resHuman.id]: resHuman,
-        [resBot.id]: resBot,
-        [resCentral.id]: resCentral,
-      },
-      list: [BotMain, HumanMain, resHuman, resBot, resCentral],
+      [BotMain.id]: BotMain,
+      [HumanMain.id]: HumanMain,
+      [resHuman.id]: resHuman,
+      [resBot.id]: resBot,
+      [resCentral.id]: resCentral,
     },
   };
 };

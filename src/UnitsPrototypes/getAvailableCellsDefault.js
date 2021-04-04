@@ -1,17 +1,15 @@
 import { UNIT_TYPE } from "../UNIT_TYPE";
 import { uniq } from "lodash";
+import { getList } from "../utils";
 
 var Victor = require("victor");
 
 function getAvailableCellsDefault(state, teamId, building) {
-  const {
-    field,
-    allUnits: { list },
-  } = state;
+  const { field, allUnits } = state;
 
   const availableCells = [];
 
-  const extendingBuildings = list.filter(
+  const extendingBuildings = getList(allUnits).filter(
     (unit) =>
       unit.team === teamId &&
       [UNIT_TYPE.MAIN_BASE, UNIT_TYPE.EXTENDER].includes(unit.type)

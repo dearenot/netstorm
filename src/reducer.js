@@ -1,6 +1,6 @@
 import { createFirstLevel } from "./units";
-import { cloneDeep, merge, remove } from "lodash";
-import { createField } from "./utils";
+import { cloneDeep, remove } from "lodash";
+import { createField, getList } from "./utils";
 import ACTION_TYPE from "./actionsTypes";
 import { uuidv4 } from "./utils";
 import { mergeDeepRight } from "ramda";
@@ -22,11 +22,9 @@ export const initialGameState = {
     turns: [],
     currentTurn: [],
     actionsToExecute: [],
+    turnIsResolving: false,
   },
-  allUnits: {
-    byId: {},
-    list: [],
-  },
+  allUnits: {},
 };
 
 const reducer = (state = initialGameState, action) => {
@@ -76,8 +74,7 @@ const reducer = (state = initialGameState, action) => {
             newState.field[posY][posX] = newBuilding.id;
             newState.players.human.buildings.push(newBuilding);
 
-            newState.allUnits.byId[newBuilding.id] = newBuilding;
-            newState.allUnits.list.push(newBuilding);
+            newState.allUnits[newBuilding.id] = newBuilding;
 
             break;
           }
@@ -91,14 +88,14 @@ const reducer = (state = initialGameState, action) => {
 
       // BELOW ACTIONS OF EXISTING UNITS
 
-      // console.log(newState.allUnits.list);
-
       const gameActions = [];
 
-      newState.allUnits.list.forEach((unit) => {
-        if (unit.gamePrototype.actions.length) {
-          // console.log(unit.gamePrototype.actions);
+      // console.log(newState.allUnits, getList(newState.allUnits));
 
+      getList(newState.allUnits).forEach((unit) => {
+        console.log(unit);
+
+        if (unit.gamePrototype.actions.length) {
           unit.gamePrototype.actions.forEach((unitAction) => {
             const actInstance = {
               ...unitAction,

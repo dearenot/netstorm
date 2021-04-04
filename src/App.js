@@ -7,6 +7,7 @@ import { isNil } from "lodash";
 import BuildingUI from "./BuildingUI";
 import GameActionsUI from "./GameActionsUI";
 import { UNIT_TYPE } from "./UNIT_TYPE";
+import { getList } from "./utils";
 
 export const SKIP_TURN = "SKIP_TURN";
 
@@ -45,14 +46,17 @@ const App = () => {
     field,
     players: { human, bot },
     game: { currentTurn, turnNumber, actionsToExecute },
-    allUnits: { byId: unitsById, list: unitsList },
+    allUnits: unitsById,
   } = state;
 
   const { currentBuilding, buildings, buildingPrototype } = human;
 
   const resFromUnits = useMemo(
-    () => unitsList.filter((unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE),
-    [unitsList]
+    () =>
+      getList(unitsById).filter(
+        (unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE
+      ),
+    [unitsById]
   );
 
   const availableCells =
@@ -118,12 +122,6 @@ const App = () => {
       }
     }
   }, [currentTurn]);
-
-  async function processArray(array) {
-    for (const item of array) {
-      await patchedDispatch(item);
-    }
-  }
 
   //exec acts
   useEffect(() => {

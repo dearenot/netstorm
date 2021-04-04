@@ -39,7 +39,7 @@ export const MainBasePrototype = BuildingPrototype({
   type: UNIT_TYPE.MAIN_BASE,
   cost: 1,
   cooldown: 0,
-  hitpoints: 20,
+  hitpoints: 1,
   buildingTime: 0,
   gameConstructor: MainBaseInstance,
   gameRender: "main",

@@ -1,16 +1,7 @@
-import {
-  get,
-  noop,
-  filter,
-  without,
-  sortBy,
-  first,
-  set,
-  omit,
-  pickBy,
-} from "lodash";
+import { get, noop, filter, sortBy, first, set, omit, pickBy } from "lodash";
 import Victor from "victor";
 import { UNIT_TYPE } from "../UNIT_TYPE";
+import { getList } from "../utils";
 
 const ActionPrototype = ({
   type = "DEFAULT_ACTION_PROTOTYPE",
@@ -41,14 +32,12 @@ const MainBaseGenerateResourceExecute = (state, options) => {
 };
 
 const gathererGatherResource = (state, options) => {
-  const {
-    allUnits: { byId: allUnitsIds, list: allUnitsList },
-  } = state;
+  const { allUnits } = state;
   const { unitInstanceId } = options;
 
-  const building = allUnitsIds[unitInstanceId];
+  const building = allUnits[unitInstanceId];
 
-  const resources = allUnitsList.filter(
+  const resources = getList(allUnits).filter(
     (unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE
   );
 
@@ -74,7 +63,7 @@ const gathererGatherResource = (state, options) => {
       let resource = resourceToGather.resource;
 
       if (resource.currentHitpoints > 0) {
-        const pathHps = `allUnits.byId[${resource.id}].currentHitpoints`;
+        const pathHps = `allUnits[${resource.id}].currentHitpoints`;
         const curHp = get(state, pathHps, 0);
 
         set(newState, pathHps, curHp - 1);
@@ -84,9 +73,11 @@ const gathererGatherResource = (state, options) => {
 
         set(newState, path, cur + 1);
 
-        if (curHp - 1 <= 0) {
-          newState.allUnits.byId = pickBy(
-            state.allUnits.byId,
+        const curHpAfter = get(newState, pathHps, 0);
+
+        if (curHpAfter <= 0) {
+          newState.allUnits = pickBy(
+            state.allUnits,
             (unit) => unit.id !== resource.id
           );
 
@@ -101,23 +92,21 @@ const gathererGatherResource = (state, options) => {
 };
 
 const discThrowerThrow = (state, options) => {
-  const {
-    allUnits: { byId: allUnitsIds, list: allUnitsList },
-  } = state;
+  const { allUnits } = state;
   const { unitInstanceId } = options;
 
   const newState = {};
 
-  const building = allUnitsIds[unitInstanceId];
+  const building = allUnits[unitInstanceId];
 
-  const hasEnemies = allUnitsList
+  const hasEnemies = getList(allUnits)
     .filter((unit) => unit.team !== "neutral")
     .some((unit) => unit.team !== building.team);
 
   if (hasEnemies) {
     console.log("has enemies");
 
-    const distsToEnemies = allUnitsList
+    const distsToEnemies = getList(allUnits)
       .filter((unit) => unit.team !== building.team && unit.team !== "neutral")
       .map((unit) => {
         var vec1 = new Victor(building.posX, building.posY);
@@ -137,30 +126,23 @@ const discThrowerThrow = (state, options) => {
     if (enemyToAttack) {
       let enemy = enemyToAttack.enemy;
       if (enemy.currentHitpoints > 0) {
-        const path = `allUnits.byId[${enemy.id}].currentHitpoints`;
+        const path = `allUnits[${enemy.id}].currentHitpoints`;
         const cur = get(state, path, 0);
 
         set(newState, path, cur - 1);
 
         console.log(cur);
-      } else {
-        // kil enemy
-        const newUnitsArr = without(
-          allUnitsList,
-          (unit) => unit.id === enemy.id
-        );
-        const newUnitsObj = omit(allUnitsIds, (unit) => unit.id === enemy.id);
 
-        newState.allUnits = {
-          byId: { ...allUnitsIds },
-          list: [...allUnitsList],
-        };
+        const curHpAfter = get(newState, path, 0);
 
-        newState.allUnits.byId = newUnitsObj;
-        newState.allUnits.list = newUnitsArr;
+        if (curHpAfter <= 0) {
+          const newUnitsObj = omit(allUnits, (unit) => unit.id === enemy.id);
 
-        newState.field = [...state.field];
-        newState.field[enemy.posY][enemy.posX] = 0;
+          newState.allUnits = newUnitsObj;
+
+          newState.field = [...state.field];
+          newState.field[enemy.posY][enemy.posX] = 0;
+        }
       }
     }
   }

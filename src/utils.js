@@ -26,3 +26,7 @@ export function uuidv4() {
     return v.toString(16);
   });
 }
+
+export function getList(obj) {
+  return Object.values(obj);
+}
