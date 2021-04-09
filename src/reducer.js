@@ -1,5 +1,5 @@
 import { createFirstLevel } from "./units";
-import { cloneDeep, remove } from "lodash";
+import { clone, cloneDeep, get, pickBy, remove, set } from "lodash";
 import { createField, getList } from "./utils";
 import ACTION_TYPE from "./actionsTypes";
 import { uuidv4 } from "./utils";
@@ -185,6 +185,33 @@ const reducer = (state = initialGameState, action) => {
           [team]: { ...state.players[team], resources: curValue + value },
         },
       };
+    }
+
+    case ACTION_TYPE.DEAL_DAMAGE: {
+      const { unitId, damage } = action.payload;
+
+      const newState = cloneDeep(state);
+
+      const pathHps = `allUnits[${unitId}].currentHitpoints`;
+      const curHp = get(state, pathHps, 0);
+
+      set(newState, pathHps, curHp - damage);
+
+      return newState;
+    }
+
+    case ACTION_TYPE.KILL_UNIT: {
+      const { unitId } = action.payload;
+      const newState = cloneDeep(state);
+
+      console.log(state, newState);
+      const unitToRemove = newState.allUnits[unitId];
+      newState.allUnits = pickBy(state.allUnits, (unit) => unit.id !== unitId);
+
+      newState.field = [...state.field];
+      newState.field[unitToRemove.posY][unitToRemove.posX] = 0;
+
+      return newState;
     }
 
     case ACTION_TYPE.START_TURN_RESOLVE: {

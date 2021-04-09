@@ -16,7 +16,10 @@ const newDispatch = (dispatch, state) => {
     if (action.type === ACTION_TYPE.EXEC_ACTION) {
       return action.execAction.execute(state, action.execAction, dispatch);
     } else {
+      // return new Promise((resolve) => {
       dispatch(action);
+      //   resolve();
+      // });
     }
   };
 };
@@ -133,6 +136,7 @@ const App = () => {
           });
         }
 
+        console.log("END TURN RESOLVE");
         patchedDispatch({ type: ACTION_TYPE.END_TURN_RESOLVE });
       }
     }

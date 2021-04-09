@@ -1,69 +1,80 @@
 import { get, filter, sortBy, first, set, pickBy } from "lodash";
 import Victor from "victor";
+import ACTION_TYPE from "../actionsTypes";
 import { UNIT_TYPE } from "../UNIT_TYPE";
 import { getList } from "../utils";
 import { ActionPrototype } from "./actionsPrototypes";
 
 const RANGE_1 = 1.9;
 
-const gathererGatherResource = (state, options) => {
-  const { allUnits } = state;
-  const { unitInstanceId } = options;
+const gathererGatherResource = (state, action, dispatch) => {
+  return new Promise((resolve) => {
+    const { allUnits } = state;
+    const { unitInstanceId } = action.instanceParams;
 
-  const building = allUnits[unitInstanceId];
+    const building = allUnits[unitInstanceId];
 
-  const resources = getList(allUnits).filter(
-    (unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE
-  );
-
-  const newState = {};
-
-  if (resources.length) {
-    const distsToResources = resources.map((resource) => {
-      var vec1 = new Victor(building.posX, building.posY);
-      var vect2 = new Victor(resource.posX, resource.posY);
-
-      const distanceToBuilding = vect2.distance(vec1);
-      return { distanceToBuilding, resource };
-    });
-
-    const resourcesWithinRange = filter(
-      sortBy(distsToResources, (obj) => obj.distance),
-      (obj) => obj.distanceToBuilding <= RANGE_1
+    const resources = getList(allUnits).filter(
+      (unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE
     );
 
-    const resourceToGather = first(resourcesWithinRange);
+    if (resources.length) {
+      const distsToResources = resources.map((resource) => {
+        var vec1 = new Victor(building.posX, building.posY);
+        var vect2 = new Victor(resource.posX, resource.posY);
 
-    if (resourceToGather) {
-      let resource = resourceToGather.resource;
+        const distanceToBuilding = vect2.distance(vec1);
+        return { distanceToBuilding, resource };
+      });
 
-      if (resource.currentHitpoints > 0) {
-        const pathHps = `allUnits[${resource.id}].currentHitpoints`;
-        const curHp = get(state, pathHps, 0);
+      const resourcesWithinRange = filter(
+        sortBy(distsToResources, (obj) => obj.distance),
+        (obj) => obj.distanceToBuilding <= RANGE_1
+      );
 
-        set(newState, pathHps, curHp - 1);
+      const resourceToGather = first(resourcesWithinRange);
 
-        const path = `players[${building.team}].resources`;
-        const cur = get(state, path, 0);
+      if (resourceToGather) {
+        let resource = resourceToGather.resource;
 
-        set(newState, path, cur + 1);
+        if (resource.currentHitpoints > 0) {
+          setTimeout(() => {
+            dispatch({
+              type: ACTION_TYPE.DEAL_DAMAGE,
+              payload: { unitId: resource.id, damage: 1 },
+            });
+          }, 50);
 
-        const curHpAfter = get(newState, pathHps, 0);
+          setTimeout(() => {
+            dispatch({
+              type: ACTION_TYPE.ADD_RESOURCE_TEAM,
+              payload: { team: building.team, value: 1 },
+            });
+            resolve();
+          }, 100);
 
-        if (curHpAfter <= 0) {
-          newState.allUnits = pickBy(
-            state.allUnits,
-            (unit) => unit.id !== resource.id
-          );
+          const pathHps = `allUnits[${resource.id}].currentHitpoints`;
+          const curHpAfter = get(state, pathHps, 0);
 
-          newState.field = [...state.field];
-          newState.field[resource.posY][resource.posX] = 0;
+          if (curHpAfter - 1 <= 0) {
+            setTimeout(() => {
+              dispatch({
+                type: ACTION_TYPE.KILL_UNIT,
+                payload: { unitId: resource.id },
+              });
+
+              resolve();
+            }, 50);
+          }
         }
+      } else {
+        // no res to gather
+        resolve();
       }
+    } else {
+      resolve();
     }
-  }
-
-  return newState;
+  });
 };
 
 export const GathererGatherResource = ActionPrototype({

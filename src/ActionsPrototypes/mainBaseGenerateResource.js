@@ -12,7 +12,7 @@ const MainBaseGenerateResourceExecute = (state, action, dispatch) => {
       });
 
       resolve();
-    }, 1000);
+    }, 100);
   });
 };
 

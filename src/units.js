@@ -195,9 +195,9 @@ export const createFirstLevel = () => {
   const field30 = createField(8, 8);
   addToField(field30, HumanMain);
   addToField(field30, BotMain);
-  // addToField(field30, resBot);
-  // addToField(field30, resCentral);
-  // addToField(field30, resHuman);
+  addToField(field30, resBot);
+  addToField(field30, resCentral);
+  addToField(field30, resHuman);
   // addToField(field30, BotDisc1);
 
   return {
@@ -216,9 +216,9 @@ export const createFirstLevel = () => {
     allUnits: {
       [BotMain.id]: BotMain,
       [HumanMain.id]: HumanMain,
-      // [resHuman.id]: resHuman,
-      // [resBot.id]: resBot,
-      // [resCentral.id]: resCentral,
+      [resHuman.id]: resHuman,
+      [resBot.id]: resBot,
+      [resCentral.id]: resCentral,
       // [BotDisc1.id]: BotDisc1,
     },
   };
