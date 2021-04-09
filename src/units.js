@@ -198,7 +198,7 @@ export const createFirstLevel = () => {
   addToField(field30, resBot);
   addToField(field30, resCentral);
   addToField(field30, resHuman);
-  // addToField(field30, BotDisc1);
+  addToField(field30, BotDisc1);
 
   return {
     field: field30,
@@ -219,7 +219,7 @@ export const createFirstLevel = () => {
       [resHuman.id]: resHuman,
       [resBot.id]: resBot,
       [resCentral.id]: resCentral,
-      // [BotDisc1.id]: BotDisc1,
+      [BotDisc1.id]: BotDisc1,
     },
   };
 };
