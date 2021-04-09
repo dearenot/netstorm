@@ -17,7 +17,11 @@ const newDispatch = (dispatch) => {
       return new Promise((resolve) => {
         const { delay } = action.execAction.instanceParams;
 
+        console.log("act ", action);
+
         // pass top level resolve and dispatch to exec action
+
+        // action.exec(resolve, dispatch)
 
         // start anim
         dispatch(action);

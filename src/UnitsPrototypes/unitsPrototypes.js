@@ -1,8 +1,8 @@
-import {
-  DiscThrowerThrow,
-  GathererGatherResource,
-  MainBaseGenerateResourcePrototype,
-} from "../ActionsPrototypes/actionsPrototypes";
+import { DiscThrowerThrow } from "../ActionsPrototypes/discThrowerThrow";
+import { GathererGatherResource } from "../ActionsPrototypes/gathererGatherResource";
+import { MainBaseGenerateResourcePrototype } from "../ActionsPrototypes/mainBaseGenerateResource";
+import { SunCannonShoot } from "../ActionsPrototypes/sunCannonShoot";
+
 import {
   ExtenderInstance,
   GathererInstance,
@@ -104,7 +104,7 @@ export const SunCannonPrototype = BuildingPrototype({
   gameConstructor: SunCannonInstance,
   gameRender: "sun_cannon",
   getAvailableCells: getAvailableCellsDefault,
-  actions: [],
+  actions: [SunCannonShoot],
 });
 
 export const BuildingPrototypes = {

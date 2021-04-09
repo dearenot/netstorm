@@ -93,7 +93,7 @@ const reducer = (state = initialGameState, action) => {
       // console.log(newState.allUnits, getList(newState.allUnits));
 
       getList(newState.allUnits).forEach((unit) => {
-        console.log(unit);
+        // console.log(unit);
 
         if (unit.gamePrototype.actions.length) {
           unit.gamePrototype.actions.forEach((unitAction) => {
@@ -104,7 +104,7 @@ const reducer = (state = initialGameState, action) => {
                 unitInstanceId: unit.id,
                 team: unit.team,
                 turn: state.game.turnNumber,
-                delay: 500,
+                delay: 100,
               },
             };
 
