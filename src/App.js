@@ -11,28 +11,10 @@ import { getList } from "./utils";
 
 export const SKIP_TURN = "SKIP_TURN";
 
-const newDispatch = (dispatch) => {
+const newDispatch = (dispatch, state) => {
   return (action) => {
     if (action.type === ACTION_TYPE.EXEC_ACTION) {
-      return new Promise((resolve) => {
-        const { delay } = action.execAction.instanceParams;
-
-        console.log("act ", action);
-
-        // pass top level resolve and dispatch to exec action
-
-        // action.exec(resolve, dispatch)
-
-        // start anim
-        dispatch(action);
-
-        // after act delay
-        setTimeout(() => {
-          console.log("resolve");
-
-          resolve();
-        }, delay);
-      });
+      return action.execAction.execute(state, action.execAction, dispatch);
     } else {
       dispatch(action);
     }
@@ -42,7 +24,10 @@ const newDispatch = (dispatch) => {
 const App = () => {
   const [state, dispatch] = useReducer(reducer, initialGameState);
 
-  const patchedDispatch = useMemo(() => newDispatch(dispatch), [dispatch]);
+  const patchedDispatch = useMemo(() => newDispatch(dispatch, state), [
+    dispatch,
+    state,
+  ]);
 
   window.state = state;
 

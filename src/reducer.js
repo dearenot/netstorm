@@ -173,6 +173,20 @@ const reducer = (state = initialGameState, action) => {
       return mergeDeepRight(state, { ...newState, ...nextState });
     }
 
+    case ACTION_TYPE.ADD_RESOURCE_TEAM: {
+      const { value, team } = action.payload;
+
+      const curValue = state.players[team].resources;
+
+      return {
+        ...state,
+        players: {
+          ...state.players,
+          [team]: { ...state.players[team], resources: curValue + value },
+        },
+      };
+    }
+
     case ACTION_TYPE.START_TURN_RESOLVE: {
       return { ...state, game: { ...state.game, turnIsResolving: true } };
     }
