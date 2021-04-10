@@ -30,3 +30,10 @@ export function uuidv4() {
 export function getList(obj) {
   return Object.values(obj);
 }
+
+export function areOnSameLine(unit1, unit2) {
+  return unit1.posX === unit2.posX || unit1.posY === unit2.posY;
+}
+
+export const RANGE_1 = 1.9;
+export const RANGE_4 = 4.9;

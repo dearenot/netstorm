@@ -1,4 +1,4 @@
-import { get, filter, sortBy, first, set, omit } from "lodash";
+import { get, filter, sortBy, first } from "lodash";
 import Victor from "victor";
 import ACTION_TYPE from "../actionsTypes";
 
