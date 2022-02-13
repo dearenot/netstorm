@@ -64,7 +64,7 @@ export const MineralResourcePrototype = BuildingPrototype({
   type: UNIT_TYPE.MINERAL_RESOURCE,
   cost: 0,
   cooldown: 0,
-  hitpoints: 2,
+  hitpoints: 20,
   buildingTime: 0,
   gameConstructor: MineralResourceInstance,
   gameRender: "resource",

@@ -1,9 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 import ACTION_TYPE from "./actionsTypes";
-import { SKIP_TURN } from "./App";
+import { AppContext, SKIP_TURN } from "./App";
 
 function GameActionsUI({ onButtonClick, turnIsResolving = false }) {
   const items = [ACTION_TYPE.CANCEL_BUILDING, SKIP_TURN];
+  const { state } = useContext(AppContext);
 
   const handleClick = useCallback(
     (event) => {
@@ -14,12 +15,14 @@ function GameActionsUI({ onButtonClick, turnIsResolving = false }) {
     [onButtonClick]
   );
 
+  const hasCurrentBuilding = !!state.players.human.currentBuilding
+
   return items.map((item) => (
     <button
       key={item}
       data-value={item}
       onClick={handleClick}
-      disabled={turnIsResolving}
+      disabled={turnIsResolving || (item === ACTION_TYPE.CANCEL_BUILDING && !hasCurrentBuilding)}
     >
       {item}
     </button>

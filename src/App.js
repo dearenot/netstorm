@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer } from "react";
 import "./styles.css";
 import Cell from "./Cell";
 import reducer, { initialGameState } from "./reducer";
@@ -24,13 +24,17 @@ const newDispatch = (dispatch, state) => {
   };
 };
 
+export const AppContext = React.createContext(null);
+
 const App = () => {
   const [state, dispatch] = useReducer(reducer, initialGameState);
 
-  const patchedDispatch = useMemo(() => newDispatch(dispatch, state), [
-    dispatch,
-    state,
-  ]);
+  const patchedDispatch = useMemo(
+    () => newDispatch(dispatch, state),
+    [dispatch, state]
+  );
+
+  console.log(AppContext);
 
   window.state = state;
 
@@ -192,58 +196,60 @@ const App = () => {
   //TODO move ui buttons from building buttons
 
   return (
-    <div className="appWrapper">
-      <div className="fieldWrapper">
-        {field.length &&
-          state.field.map((fieldColumn, indexY) => {
-            return fieldColumn.map((field, indexX) => {
-              const coord = `${indexX}_${indexY}`;
+    <AppContext.Provider value={{ state, patchedDispatch }}>
+      <div className="appWrapper">
+        <div className="fieldWrapper">
+          {field.length &&
+            state.field.map((fieldColumn, indexY) => {
+              return fieldColumn.map((field, indexX) => {
+                const coord = `${indexX}_${indexY}`;
 
-              return (
-                <Cell
-                  currentBuilding={currentBuilding}
-                  className="fieldCell"
-                  value={field}
-                  key={coord}
-                  indexX={indexX}
-                  indexY={indexY}
-                  onClick={handleCellClick}
-                  humanBuildings={buildings}
-                  resources={resFromUnits}
-                  unitsById={unitsById}
-                  id={`${indexY}_${indexX}`}
-                  availableCells={availableCells}
-                />
-              );
-            });
-          })}
-      </div>
-
-      <div className="rightBar">
-        <div className="uiBar">
-          <div className="uiColumn">
-            human
-            <div>{human.resources} </div>
-            <div>{human.currentBuilding} </div>
-          </div>
-          <div className="uiColumn">
-            bot
-            <div>{bot.resources} </div>
-          </div>
+                return (
+                  <Cell
+                    currentBuilding={currentBuilding}
+                    className="fieldCell"
+                    value={field}
+                    key={coord}
+                    indexX={indexX}
+                    indexY={indexY}
+                    onClick={handleCellClick}
+                    humanBuildings={buildings}
+                    resources={resFromUnits}
+                    unitsById={unitsById}
+                    id={`${indexY}_${indexX}`}
+                    availableCells={availableCells}
+                  />
+                );
+              });
+            })}
         </div>
 
-        <div>turn number {turnNumber}</div>
-        <BuildingUI
-          human={human}
-          onBuildButtonClick={handleBuildButtonClick}
-          turnIsResolving={turnIsResolving}
-        />
-        <GameActionsUI
-          onButtonClick={handleUIActionClick}
-          turnIsResolving={turnIsResolving}
-        />
+        <div className="rightBar">
+          <div className="uiBar">
+            <div className="uiColumn">
+              human
+              <div>{human.resources} </div>
+              <div>{human.currentBuilding} </div>
+            </div>
+            <div className="uiColumn">
+              bot
+              <div>{bot.resources} </div>
+            </div>
+          </div>
+
+          <div>turn number {turnNumber}</div>
+          <BuildingUI
+            human={human}
+            onBuildButtonClick={handleBuildButtonClick}
+            turnIsResolving={turnIsResolving}
+          />
+          <GameActionsUI
+            onButtonClick={handleUIActionClick}
+            turnIsResolving={turnIsResolving}
+          />
+        </div>
       </div>
-    </div>
+    </AppContext.Provider>
   );
 };
 
