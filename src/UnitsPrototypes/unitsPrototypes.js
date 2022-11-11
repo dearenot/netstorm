@@ -4,7 +4,7 @@ import { MainBaseGenerateResourcePrototype } from "../ActionsPrototypes/mainBase
 import { SunCannonShoot } from "../ActionsPrototypes/sunCannonShoot";
 
 import {
-  ExtenderInstance,
+  GeneratorInstance,
   GathererInstance,
   MainBaseInstance,
   MineralResourceInstance,
@@ -48,14 +48,14 @@ export const MainBasePrototype = BuildingPrototype({
   actions: [MainBaseGenerateResourcePrototype],
 });
 
-export const ExtenderPrototype = BuildingPrototype({
-  type: UNIT_TYPE.EXTENDER,
+export const GeneratorPrototype = BuildingPrototype({
+  type: UNIT_TYPE.GENERATOR,
   cost: 1,
   cooldown: 0,
   hitpoints: 5,
   buildingTime: 0,
-  gameConstructor: ExtenderInstance,
-  gameRender: "extender",
+  gameConstructor: GeneratorInstance,
+  gameRender: "generator",
   getAvailableCells: getAvailableCellsDefault,
   actions: [],
 });
@@ -109,7 +109,7 @@ export const SunCannonPrototype = BuildingPrototype({
 
 export const BuildingPrototypes = {
   // [UNIT_TYPE.MAIN_BASE]: MainBasePrototype,
-  [UNIT_TYPE.EXTENDER]: ExtenderPrototype,
+  [UNIT_TYPE.GENERATOR]: GeneratorPrototype,
   [UNIT_TYPE.GATHERER]: GathererPrototype,
   [UNIT_TYPE.DISC_THROWER]: DiscThrowerPrototype,
   [UNIT_TYPE.SUN_CANNON]: SunCannonPrototype,

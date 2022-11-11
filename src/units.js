@@ -1,6 +1,6 @@
 import {
   DiscThrowerPrototype,
-  ExtenderPrototype,
+  GeneratorPrototype,
   GathererPrototype,
   MainBasePrototype,
   MineralResourcePrototype,
@@ -44,20 +44,20 @@ export function MainBaseInstance({
   };
 }
 
-export function ExtenderInstance({
+export function GeneratorInstance({
   team,
-  id = `${team}_extender_${uuidv4()}`,
+  id = `${team}_generator_${uuidv4()}`,
   posX,
   posY,
 }) {
   return {
-    type: UNIT_TYPE.EXTENDER,
+    type: UNIT_TYPE.GENERATOR,
     id,
     team,
     posX,
     posY,
-    currentHitpoints: ExtenderPrototype.hitpoints,
-    gamePrototype: ExtenderPrototype,
+    currentHitpoints: GeneratorPrototype.hitpoints,
+    gamePrototype: GeneratorPrototype,
   };
 }
 

@@ -12,7 +12,7 @@ function getAvailableCellsDefault(state, teamId, building) {
   const extendingBuildings = getList(allUnits).filter(
     (unit) =>
       unit.team === teamId &&
-      [UNIT_TYPE.MAIN_BASE, UNIT_TYPE.EXTENDER].includes(unit.type)
+      [UNIT_TYPE.MAIN_BASE, UNIT_TYPE.GENERATOR].includes(unit.type)
   );
 
   extendingBuildings.forEach((building) => {
