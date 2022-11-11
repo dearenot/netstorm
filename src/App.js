@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import "./styles.css";
 import Cell from "./Cell";
 import reducer, { initialGameState } from "./reducer";
@@ -6,8 +6,6 @@ import ACTION_TYPE from "./actionsTypes";
 import { isNil } from "lodash";
 import BuildingUI from "./BuildingUI";
 import GameActionsUI from "./GameActionsUI";
-import { UNIT_TYPE } from "./UNIT_TYPE";
-import { getList } from "./utils";
 
 export const SKIP_TURN = "SKIP_TURN";
 
@@ -28,14 +26,9 @@ export const AppContext = React.createContext(null);
 
 const App = () => {
   const [state, dispatch] = useReducer(reducer, initialGameState);
+  const [isInit, toggleInit] = useState(false);
 
-  const patchedDispatch = useMemo(
-    () => newDispatch(dispatch, state),
-    [dispatch, state]
-  );
-
-  console.log(AppContext);
-
+  const patchedDispatch = newDispatch(dispatch, state);
   window.state = state;
 
   const {
@@ -47,20 +40,15 @@ const App = () => {
 
   const { currentBuilding, buildings, buildingPrototype } = human;
 
-  const resFromUnits = useMemo(
-    () =>
-      getList(unitsById).filter(
-        (unit) => unit.type === UNIT_TYPE.MINERAL_RESOURCE
-      ),
-    [unitsById]
-  );
-
   const availableCells =
     buildingPrototype?.getAvailableCells(state, "human", currentBuilding) || [];
 
   useEffect(() => {
-    patchedDispatch({ type: ACTION_TYPE.INIT_FIRST_LEVEL });
-  }, []);
+    if (!isInit) {
+      toggleInit(true);
+      patchedDispatch({ type: ACTION_TYPE.INIT_FIRST_LEVEL });
+    }
+  }, [patchedDispatch, isInit]);
 
   const handleCellClick = useCallback(
     (event) => {
@@ -106,7 +94,7 @@ const App = () => {
         });
       }
     }
-  }, [currentTurn]);
+  }, [currentTurn, patchedDispatch]);
 
   //resolve turn
   useEffect(() => {
@@ -118,7 +106,7 @@ const App = () => {
         patchedDispatch({ type: ACTION_TYPE.RESOLVE_TURN });
       }
     }
-  }, [currentTurn]);
+  }, [currentTurn, patchedDispatch]);
 
   //exec acts
   useEffect(() => {
@@ -214,7 +202,6 @@ const App = () => {
                     indexY={indexY}
                     onClick={handleCellClick}
                     humanBuildings={buildings}
-                    resources={resFromUnits}
                     unitsById={unitsById}
                     id={`${indexY}_${indexX}`}
                     availableCells={availableCells}
